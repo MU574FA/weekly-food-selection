@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Items Selection</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+      }
+      th {
+        background-color: #f2f2f2;
+        position: relative;
+      }
+      /* Hide elements in print */
+      @media print {
+        button {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h2 contenteditable="true" style="text-align: center">Weekly Food Selection</h2>
+
+    <!-- Table for selecting food for each day -->
+    <table id="foodTable">
+      <thead>
+        <tr>
+          <th contenteditable="true">Day</th>
+          <th contenteditable="true">Food 1 <button class="remove-btn" onclick="removeColumn(1)" style="font-size: 0.8em">Remove</button></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <p contenteditable="true">Day 1</p>
+            <button class="remove-btn" onclick="removeDay(this)" style="font-size: 0.8em">Remove</button>
+          </td>
+          <td><input type="checkbox" /></td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- Button to add a new day row -->
+    <button style="margin-top: 2em; padding: 1em" onclick="addDay()">Add Day</button>
+    <!-- Button to add a new food column -->
+    <button style="margin-top: 2em; padding: 1em" onclick="addFood()">Add Food</button>
+    <!-- Hide / Show all remove buttons -->
+    <button style="margin-top: 2em; padding: 1em" onclick="toggleRemoveBtns()">Hide/Show Buttons</button>
+    <!-- Print Button -->
+    <button style="margin-top: 2em; padding: 1em" onclick="window.print()">Print</button>
+    <!-- Reset Button -->
+    <button style="margin-top: 2em; padding: 1em" onclick="window.location.reload()">Reset</button>
+
+    <script>
+      let dayCount = 1;
+
+      // Function to add a new day row
+      function addDay() {
+        dayCount++;
+        const table = document.getElementById("foodTable").getElementsByTagName("tbody")[0];
+        const newRow = table.insertRow(-1);
+
+        // Add the day cell with a remove button
+        const dayCell = newRow.insertCell(0);
+        dayCell.contentEditable = "true";
+        dayCell.innerHTML = `<p contenteditable="true"> Day ${dayCount}</p><button style="display: ${document.querySelectorAll(".remove-btn")[0].style.display}" class="remove-btn" onclick="removeDay(this)" style="font-size: 0.8em;">Remove</button>`;
+
+        // Add empty cells with checkboxes for each existing food column
+        const foodColumnCount = document.getElementById("foodTable").rows[0].cells.length - 1;
+        for (let i = 0; i < foodColumnCount; i++) {
+          const newCell = newRow.insertCell(-1);
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          newCell.appendChild(checkbox);
+        }
+      }
+
+      // Function to remove a specific day row
+      function removeDay(button) {
+        const row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+      }
+
+      // Function to add a new food column
+      function addFood() {
+        const table = document.getElementById("foodTable");
+        const headerRow = table.rows[0];
+        const newFoodIndex = headerRow.cells.length;
+
+        // Add a new editable column header with a remove button
+        const th = document.createElement("th");
+        th.contentEditable = "true";
+        th.innerHTML = `Food ${newFoodIndex} <button style="display: ${document.querySelectorAll(".remove-btn")[0].style.display}" class="remove-btn" onclick="removeColumn(this)" style="font-size: 0.8em;">Remove</button>`;
+        headerRow.appendChild(th);
+
+        // Add a checkbox cell for each day
+        for (let i = 1; i < table.rows.length; i++) {
+          const newRow = table.rows[i];
+          const newCell = newRow.insertCell(-1);
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          newCell.appendChild(checkbox);
+        }
+      }
+
+      // Function to remove a specific column
+      function removeColumn(button) {
+        const table = document.getElementById("foodTable");
+        const headerRow = table.rows[0];
+
+        // Find the index of the button's parent <th> element
+        const columnIndex = Array.from(headerRow.cells).indexOf(button.parentNode);
+
+        // Loop through each row and remove the cell at the columnIndex
+        for (let i = 0; i < table.rows.length; i++) {
+          table.rows[i].deleteCell(columnIndex);
+        }
+      }
+
+      // Hide and show all remove buttons
+      function toggleRemoveBtns() {
+        const elements = document.querySelectorAll(".remove-btn");
+        elements.forEach((element) => {
+          if (element.style.display === "none") {
+            element.style.display = "";
+          } else {
+            element.style.display = "none";
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
